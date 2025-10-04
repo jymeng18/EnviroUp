@@ -1,5 +1,6 @@
 // frontend/src/App.jsx
 import { useEffect, useState } from 'react';
+import './App.css'
 import SearchBox from './searchBox.jsx'
 
 function App() {
@@ -22,10 +23,10 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Finance Tracker Dashboard</h1>
+      <h1 className="app-title">We track the wildfire near you</h1>
 
-      <section style={{ marginBottom: 20 }}>
-        <h3>Search Transactions</h3>
+      <section className="search-section" style={{ marginBottom: 20 }}>
+        <h3>Search for location</h3>
         <SearchBox onResults={data => setSearchResults(data)} />
         {searchResults && (
           <div style={{ marginTop: 12 }}>
@@ -45,14 +46,11 @@ function App() {
         )}
       </section>
 
-      <h3>Recent Transactions</h3>
-      <ul>
-        {transactions.map(t => (
-          <li key={t.id}>
-            {t.date}: ${t.amount.toFixed(2)} - {t.category}
-          </li>
-        ))}
-      </ul>
+
+      <section className="info-section">
+        <h3>Nearest wildfire</h3>
+        
+      </section>
     </div>
   );
 }
