@@ -1,110 +1,163 @@
-# wildfire_predict_bc_json.py
 import pandas as pd
 import numpy as np
 from math import radians, cos, sin, asin, sqrt
-from scipy.ndimage import gaussian_filter
-from scipy import ndimage
-from datetime import datetime, timedelta, timezone
-import random
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
+from datetime import datetime, timezone
 import json
 
-# ------------------ Step 1: BC inland centers ------------------
-BC_CENTERS = [
-    (49.2827, -123.1207),  # Vancouver
-    (48.4284, -123.3656),  # Victoria
-    (49.8951, -119.4940),  # Kelowna
-    (50.1163, -120.3470),  # Kamloops
-    (53.9171, -122.7497),  # Prince George
-    (52.9840, -122.4930),  # Quesnel
-    (52.1292, -122.1409),  # Williams Lake
-    (49.1666, -122.9050),  # Hope
-    (49.4936, -117.2942),  # Nelson
-    (49.0955, -117.7140),  # Trail
-]
-
-def jitter_point(lat, lon, max_km=12):
-    import math
-    km_to_deg_lat = 1.0 / 111.0
-    km_to_deg_lon = 1.0 / (111.0 * math.cos(math.radians(lat)))
-    r = max_km * (random.random() ** 0.5)
-    theta = random.random() * 2 * np.pi
-    dlat = r * km_to_deg_lat * np.cos(theta)
-    dlon = r * km_to_deg_lon * np.sin(theta)
-    return lat + dlat, lon + dlon
-
-def generate_hotspots(total=500, days_back=7):
-    rows = []
-    now = datetime.now(timezone.utc)
-    for _ in range(total):
-        clat, clon = random.choice(BC_CENTERS)
-        lat, lon = jitter_point(clat, clon)
-        acq_dt = now - timedelta(days=random.randint(0, days_back-1))
-        acq_date_str = acq_dt.strftime("%Y-%m-%d")
-        confidence = random.randint(60, 100)
-        rows.append({"latitude": lat, "longitude": lon, "acq_date": acq_date_str, "confidence": confidence})
-    df = pd.DataFrame(rows)
-    return df
-
-# ------------------ Step 2: Haversine distance ------------------
+# ------------------ Step 1: Haversine distance (vectorized) ------------------
 def haversine_km(lat1, lon1, lat2, lon2):
     R = 6371.0
-    phi1, phi2 = radians(lat1), radians(lat2)
-    dphi = radians(lat2 - lat1)
-    dlambda = radians(lon2 - lon1)
-    a = sin(dphi/2)**2 + cos(phi1)*cos(phi2)*sin(dlambda/2)**2
-    return 2*R*asin(sqrt(a))
+    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = np.sin(dlat/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
+    return 2*R*np.arcsin(np.sqrt(a))
 
-# ------------------ Step 3: Wildfire prediction (JSON output) ------------------
-def predict_wildfire_coords_json(firms_df, center_lat, center_lon,
-                                 search_radius_km=50, grid_res_km=1.0,
-                                 time_decay_days=3, top_n=5):
-    firms_df = firms_df.copy()
-    firms_df['dist_km'] = firms_df.apply(lambda r: haversine_km(center_lat, center_lon, r['latitude'], r['longitude']), axis=1)
-    df_local = firms_df[firms_df['dist_km'] <= search_radius_km].copy()
-    now = pd.Timestamp.now(tz="UTC")
-    df_local['acq_datetime'] = pd.to_datetime(df_local['acq_date'], utc=True)
-    df_local['age_days'] = (now - df_local['acq_datetime']).dt.total_seconds() / (3600*24)
-    df_local['time_w'] = np.exp(-df_local['age_days']/max(1.0, time_decay_days))
-    df_local['weight'] = df_local['time_w'] * df_local['confidence']/100.0
+# ------------------ Step 2: Load and preprocess wildfire data ------------------
+def load_wildfire_data(csv_path="/Users/nohimjayasinghe/Downloads/viirs-jpss1_2024_Canada.csv"):
+    df = pd.read_csv(csv_path)
+    # Filter for British Columbia (approximate bounds: lat 48-60, lon -139 to -114)
+    df = df[(df['latitude'].between(48, 60)) & (df['longitude'].between(-139, -114))]
+    # Filter for presumed vegetation fires (type == 0)
+    df = df[df['type'] == 0]
+    # Filter for fall season (September–November)
+    df['acq_datetime'] = pd.to_datetime(df['acq_date'], utc=True)
+    df = df[df['acq_datetime'].dt.month.isin([9, 10, 11])]
+    # Use 'frp' as proxy for fire size/intensity
+    df['SIZE_HA'] = df['frp']  # Assuming frp correlates with size
+    # Handle confidence column
+    df['confidence'] = df['confidence'].fillna('n')  # Default to nominal
+    # No ECOZ_NAME or CAUSE, so add placeholders
+    df['ECOZ_NAME'] = 'Unknown'
+    df['CAUSE'] = 'Unknown'
+    return df
 
-    # Create grid for KDE
+# ------------------ Step 3: Prepare training data ------------------
+def prepare_training_data(df, grid_res_km=1.0):
+    # Create a grid covering BC (approximate bounds: 48–60N, -139–-114W)
     km_per_deg_lat = 111.0
-    km_per_deg_lon = 111.0 * cos(radians(center_lat))
+    lat_step = grid_res_km / km_per_deg_lat
+    lon_step = grid_res_km / (111.0 * np.cos(radians(54)))  # Approx middle latitude
+    lat_bins = np.arange(48, 60 + 1e-8, lat_step)
+    lon_bins = np.arange(-139, -114 + 1e-8, lon_step)
+    
+    # Assign wildfires to grid cells
+    df['lat_bin'] = np.digitize(df['latitude'], lat_bins)
+    df['lon_bin'] = np.digitize(df['longitude'], lon_bins)
+    
+    # Encode confidence column
+    le_conf = LabelEncoder()
+    df['confidence_encoded'] = le_conf.fit_transform(df['confidence'])
+    
+    # Create positive samples
+    positive_samples = df[['lat_bin', 'lon_bin', 'confidence_encoded', 'SIZE_HA']].copy()
+    positive_samples['target'] = 1
+    
+    # Create negative samples
+    negative_samples = []
+    n_negatives = len(positive_samples)
+    for _ in range(n_negatives):
+        lat = np.random.uniform(48, 60)
+        lon = np.random.uniform(-139, -114)
+        lat_bin = np.digitize(lat, lat_bins)
+        lon_bin = np.digitize(lon, lon_bins)
+        negative_samples.append({
+            'lat_bin': lat_bin, 'lon_bin': lon_bin,
+            'confidence_encoded': le_conf.transform(['n'])[0],  # Default to nominal
+            'SIZE_HA': 0, 'target': 0
+        })
+    
+    # Combine samples
+    negative_df = pd.DataFrame(negative_samples)
+    data = pd.concat([positive_samples, negative_df], ignore_index=True)
+    
+    # Log-transform SIZE_HA
+    data['SIZE_HA'] = np.log1p(data['SIZE_HA'])
+    
+    return data, lat_bins, lon_bins, le_conf
+
+# ------------------ Step 4: Train ML model ------------------
+def train_model(data):
+    X = data[['lat_bin', 'lon_bin', 'confidence_encoded', 'SIZE_HA']]
+    y = data['target']
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X, y)
+    return model
+
+# ------------------ Step 5: Predict wildfire coords ------------------
+def predict_wildfire_coords_json(df, center_lat, center_lon, model, lat_bins, lon_bins, le_conf,
+                                 search_radius_km=50, grid_res_km=1.0, top_n=5):
+    # Pre-filter with bounding box
+    km_per_deg_lat = 111.0
+    km_per_deg_lon = 111.0 * np.cos(radians(center_lat))
     lat_extent = search_radius_km / km_per_deg_lat
     lon_extent = search_radius_km / km_per_deg_lon
+    lat_min, lat_max = center_lat - lat_extent, center_lat + lat_extent
+    lon_min, lon_max = center_lon - lon_extent, center_lon + lon_extent
+    df_local = df[(df['latitude'].between(lat_min, lat_max)) & 
+                  (df['longitude'].between(lon_min, lon_max))].copy()
+    
+    # Vectorized Haversine filter
+    if not df_local.empty:
+        distances = haversine_km(center_lat, center_lon, df_local['latitude'].values, df_local['longitude'].values)
+        df_local = df_local[distances <= search_radius_km]
+    
+    # Debug: Check number of wildfires in radius
+    print(f"Number of fall wildfires within {search_radius_km} km of ({center_lat}, {center_lon}): {len(df_local)}")
+    
+    # Create prediction grid
     lat_step = grid_res_km / km_per_deg_lat
     lon_step = grid_res_km / km_per_deg_lon
-    lat_bins = np.arange(center_lat - lat_extent, center_lat + lat_extent + 1e-8, lat_step)
-    lon_bins = np.arange(center_lon - lon_extent, center_lon + lon_extent + 1e-8, lon_step)
-    grid = np.zeros((len(lat_bins), len(lon_bins)), dtype=float)
-
-    for _, r in df_local.iterrows():
-        i = int(round((r['latitude'] - lat_bins[0]) / lat_step))
-        j = int(round((r['longitude'] - lon_bins[0]) / lon_step))
-        if 0 <= i < grid.shape[0] and 0 <= j < grid.shape[1]:
-            grid[i,j] += float(r['weight'])
-
-    grid_smooth = gaussian_filter(grid, sigma=2.0)
-    neighborhood = ndimage.generate_binary_structure(2,2)
-    local_max = (ndimage.maximum_filter(grid_smooth, footprint=neighborhood)==grid_smooth) & (grid_smooth>0)
-    peaks = np.argwhere(local_max)
-
-    coords = []
-    for i,j in peaks:
-        lat = float(lat_bins[i])
-        lon = float(lon_bins[j])
-        coords.append({"lat": lat, "lon": lon})
-
-    # Return top_n closest peaks to input coordinate
-    coords = sorted(coords, key=lambda x: haversine_km(center_lat, center_lon, x['lat'], x['lon']))[:top_n]
+    pred_lat_bins = np.arange(center_lat - lat_extent, center_lat + lat_extent + 1e-8, lat_step)
+    pred_lon_bins = np.arange(center_lon - lon_extent, center_lon + lon_extent + 1e-8, lon_step)
+    
+    grid_data = []
+    for i, lat in enumerate(pred_lat_bins):
+        for j, lon in enumerate(pred_lon_bins):
+            # Simplified land cover filter: exclude ocean/urban (latitudes near coast or known urban areas)
+            if abs(lon - (-123.1207)) < 0.05 and abs(lat - 49.2827) < 0.05:  # Near Vancouver urban/coast
+                continue
+            lat_bin = np.digitize(lat, lat_bins)
+            lon_bin = np.digitize(lon, lon_bins)
+            conf = df_local['confidence_encoded'].mean() if not df_local.empty else le_conf.transform(['n'])[0]
+            grid_data.append({
+                'lat_bin': lat_bin, 'lon_bin': lon_bin,
+                'confidence_encoded': conf, 'SIZE_HA': 0,
+                'lat': lat, 'lon': lon
+            })
+    
+    pred_df = pd.DataFrame(grid_data)
+    if pred_df.empty:
+        print("No grid points generated after land cover filtering. Returning empty predictions.")
+        return json.dumps([], indent=2)
+    
+    # Predict probabilities
+    X_pred = pred_df[['lat_bin', 'lon_bin', 'confidence_encoded', 'SIZE_HA']]
+    probs = model.predict_proba(X_pred)[:, 1]
+    pred_df['prob'] = probs
+    
+    # Select top N locations
+    top_preds = pred_df.sort_values(by='prob', ascending=False).head(top_n)
+    coords = [{"lat": float(row['lat']), "lon": float(row['lon'])} for _, row in top_preds.iterrows()]
+    coords = sorted(coords, key=lambda x: haversine_km(center_lat, center_lon, x['lat'], x['lon']))
     return json.dumps(coords, indent=2)
 
-# ------------------ Step 4: Main test ------------------
+# ------------------ Step 6: Main test ------------------
 if __name__ == "__main__":
-    df_fire = generate_hotspots(total=500)
-    test_lat, test_lon = 49.2827, -123.1207  # Vancouver
+    # Load and prepare data
+    df_fire = load_wildfire_data()
+    data, lat_bins, lon_bins, le_conf = prepare_training_data(df_fire)
+    
+    # Train model
+    model = train_model(data)
+    
+    # Test coordinates (Vancouver)
+    test_lat, test_lon = 49.2827, -123.1207
     print(f"Test coordinates: ({test_lat}, {test_lon})")
-
-    json_output = predict_wildfire_coords_json(df_fire, test_lat, test_lon, top_n=10)
+    
+    # Predict
+    json_output = predict_wildfire_coords_json(df_fire, test_lat, test_lon, model, lat_bins, lon_bins, le_conf, top_n=10)
     print("Predicted wildfire coordinates (JSON):")
     print(json_output)
