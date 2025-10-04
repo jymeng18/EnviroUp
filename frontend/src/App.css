@@ -1,8 +1,54 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+
+/* Website title */
+.app-title {
+  font-size: 2.2rem;
+  margin: 0 0 0.5rem 0; /* smaller gap under title */
+}
+
+/* search box */
+.search-section {
+  display: flex;
+  flex-direction: column; /* heading above the form */
+  align-items: center;    /* center horizontally */
+  justify-content: flex-start;
+  gap: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  /* allow section to size to its content instead of forcing full viewport */
+  min-height: auto;
+  box-sizing: border-box;
+}
+
+.search-section form {
+  max-width: 700px;        /* limits how wide the input+button get */
+  margin: 0 auto;          /* center the form horizontally */
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-section input[type="search"],
+.search-section input {
+  flex: 1;                 /* input expands to fill space */
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  color: inherit;
+}
+
+.search-section button {
+  padding: 8px 12px;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: auto; /* size to content */
+  box-sizing: border-box;
+  padding: 0.5rem;
 }
 
 .logo {
