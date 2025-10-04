@@ -1,6 +1,6 @@
-// frontend/src/App.jsx
-import { useEffect, useState } from 'react';
-import SearchBox from './searchBox.jsx'
+// App.jsx
+import { useState } from 'react'
+import SearchBox from './searchBox'
 
 function App() {
   const [fires, setFires] = useState([])
@@ -10,38 +10,24 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h1>Finance Tracker Dashboard</h1>
-
-      <section style={{ marginBottom: 20 }}>
-        <h3>Search Transactions</h3>
-        <SearchBox onResults={data => setSearchResults(data)} />
-        {searchResults && (
-          <div style={{ marginTop: 12 }}>
-            <h4>Search Results</h4>
-            {Array.isArray(searchResults) ? (
-              <ul>
-                {searchResults.map(item => (
-                  <li key={item.id || JSON.stringify(item)}>
-                    {item.date ? `${item.date}: $${item.amount?.toFixed?.(2) ?? item.amount} - ${item.category ?? ''}` : JSON.stringify(item)}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <pre>{JSON.stringify(searchResults, null, 2)}</pre>
-            )}
-          </div>
-        )}
-      </section>
-
-      <h3>Recent Transactions</h3>
-      <ul>
-        {transactions.map(t => (
-          <li key={t.id}>
-            {t.date}: ${t.amount.toFixed(2)} - {t.category}
-          </li>
-        ))}
-      </ul>
+    <div className="app">
+      <h1>BC Wildfire Tracker</h1>
+      <SearchBox onResults={handleSearchResults} />
+      
+      {fires.length > 0 ? (
+        <div className="fire-list">
+          <h2>Found {fires.length} wildfires</h2>
+          {fires.map((fire, idx) => (
+            <div key={idx} className="fire-item">
+              <h3>{fire.name}</h3>
+              <p>📍 {fire.latitude}, {fire.longitude}</p>
+              <p>🔥 Severity: {fire.severity}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>Search for a location to see wildfires</p>
+      )}
     </div>
   )
 }
