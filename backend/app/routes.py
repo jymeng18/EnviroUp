@@ -34,6 +34,12 @@ LOCATION_COORDS = {
     'vancouver': (49.2827, -123.1207),
     'kamloops': (50.6745, -120.3273),
     'prince george': (53.9171, -122.7497),
+    'surrey' : (49.1913, -122.8490),
+    'richmond' : (49.1666, -123.1336),
+    'burnaby' : (49.2488, -122.9805),
+    'victoria' : (48.4284, -123.3656),
+    'quesnel' : (52.9840, -122.4930),
+    'kelowna' : (49.8880, -119.4960),
 }
 
 @bp.route('/api/search', methods=['POST'])
