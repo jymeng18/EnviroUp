@@ -7,8 +7,8 @@
 
 /* App container shown as a translucent card so text is readable on top of background */
 .app {
-  width: calc(100% - 2rem);
-  max-width: 1000px;
+  width: 700px;
+  max-width: 2000px;
   margin: 2rem auto;
   background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.55));
   border-radius: 12px;
@@ -344,7 +344,6 @@
 /* Welcome Message */
 .welcome-message {
   text-align: center;
-  padding: 3rem 2rem;
   animation: fadeIn 0.8s ease;
 }
 

@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Loader } from '@googlemaps/js-api-loader';
 import 'leaflet/dist/leaflet.css';
-import {APIProvider} from 'vis.gl/react-google-maps';
 import './App.css';
 
 

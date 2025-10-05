@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import SearchBox from './searchBox'
 import MapComponent from './MapComponent'
-import {APIProvider} from 'vis.gl/react-google-maps'
+
 
 function App() {
   const [fires, setFires] = useState([])
@@ -52,20 +52,10 @@ function App() {
       )}
       
       {fires.length > 0 && showResults ? (
-        <div className="results-container">
-          <div className="fire-list">
-            <h2>Found {fires.length} wildfires</h2>
-            {fires.map((fire, idx) => (
-              <div key={idx} className="fire-item">
-                <h3>{fire.name}</h3>
-                <p> {fire.latitude}, {fire.longitude}</p>
-                <p> Severity: {fire.severity}</p>
-              </div>
-            ))}
-          </div>
+       
           
           <MapComponent fires={fires} center={center} />
-        </div>
+       
       ) : !isSearching ? (
         <div className="welcome-message">
           <p>Search for a location to see wildfires</p>
