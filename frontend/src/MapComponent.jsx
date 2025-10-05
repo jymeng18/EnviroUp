@@ -16,7 +16,7 @@ L.Icon.Default.mergeOptions({
 // Custom fire icon for Leaflet
 const fireIcon = new L.Icon({
   // Use image from the public folder. Put `icon.png` in `frontend/public/` (served at /icon.png).
-  iconUrl: '/icon.png',
+  iconUrl: '../public/icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
