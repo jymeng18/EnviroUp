@@ -59,7 +59,7 @@ export default function App() {
             <div className="welcome-message">
               <p>Search for a location to see wildfires</p>
               <div className="search-hints">
-                <span>Try: Vancouver, British Columbia, or Kamloops</span>
+                <span>Try: Vancouver, Prince George, or Kamloops</span>
               </div>
             </div>
           ) : null}

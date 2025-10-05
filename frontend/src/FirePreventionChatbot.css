@@ -33,7 +33,7 @@
 /* Chatbot Window */
 .chatbot-window {
   position: fixed;
-  bottom: 2rem;
+  bottom: 8rem;
   right: 2rem;
   width: 400px;
   height: 500px;

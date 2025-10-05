@@ -149,7 +149,7 @@ const FirePreventionChatbot = () => {
       {isOpen && (
         <div className="chatbot-window">
           <div className="chatbot-header">
-            <h3>Meet Henry</h3>
+            <h3>Meet Henry, your Fire Safety Assistant</h3>
             <button className="chatbot-close" onClick={toggleChatbot}>
               ×
             </button>
