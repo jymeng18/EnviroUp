@@ -11,28 +11,44 @@ Raising awareness about environmental issues and promoting the UN Sustainable De
 
 ## Setup Instructions
 
+### Prerequisites
+- Python 3.8+ installed
+- Node.js 16+ installed
+- Git installed
+
+### Quick Start
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/jymeng18/EnviroUp.git
+   cd EnviroUp
+   git checkout bc-wildfire-json
+   ```
+
 ### Backend Setup
 
 1. **Install Python dependencies**:
    ```bash
-   cd backend
-   pip install -r ../requirements.txt
+   # Install all required packages
+   pip install -r requirements.txt
+   
+   # Or if using conda:
+   conda install flask flask-cors pandas numpy scikit-learn -y
+   conda install -c conda-forge google-generativeai python-dotenv -y
    ```
 
 2. **Set up Gemini API Key**:
    - Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Set the environment variable:
+   - Create a `.env` file in the project root:
      ```bash
-     export GEMINI_API_KEY="your_api_key_here"
+     echo "GOOGLE_API_KEY=your_actual_api_key_here" > .env
      ```
-   - Or create a `.env` file in the project root:
-     ```
-     GEMINI_API_KEY=your_api_key_here
-     ```
+   - Replace `your_actual_api_key_here` with your real API key
 
 3. **Run the backend**:
    ```bash
-   python run.py
+   cd backend
+   GOOGLE_API_KEY=$(cat ../.env | grep API_KEY | cut -d'=' -f2) python run.py
    ```
    The backend will start on `http://localhost:5001`
 
@@ -72,6 +88,42 @@ Raising awareness about environmental issues and promoting the UN Sustainable De
 - **Frontend**: React, Vite
 - **AI**: Google Gemini Pro for fire prevention advice
 - **ML**: Random Forest for wildfire prediction
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"ModuleNotFoundError: No module named 'flask_cors'"**:
+   ```bash
+   pip install flask-cors
+   # or
+   conda install flask-cors -y
+   ```
+
+2. **"ModuleNotFoundError: No module named 'google.generativeai'"**:
+   ```bash
+   pip install google-generativeai
+   # or
+   conda install -c conda-forge google-generativeai -y
+   ```
+
+3. **"Chatbot not available" error**:
+   - Make sure your `.env` file exists and contains `GOOGLE_API_KEY=your_key_here`
+   - Verify your API key is valid at [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+4. **Port already in use**:
+   - Backend: Change port in `backend/run.py` (line 9)
+   - Frontend: Vite will automatically find next available port
+
+5. **CORS errors**:
+   - Make sure backend is running on port 5001
+   - Check that flask-cors is installed
+
+### Environment Variables
+
+The app supports both environment variable names:
+- `GOOGLE_API_KEY` (preferred)
+- `GEMINI_API_KEY` (fallback)
 
 ## Contributing
 
