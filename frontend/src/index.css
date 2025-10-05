@@ -30,6 +30,12 @@ body {
   justify-content: center;/* horizontal centering */
   min-width: 320px;
   min-height: 100vh;
+  /* full-viewport background image (served from public/) */
+  background-image: url('/background.jpeg');
+  background-size: cover;           /* scale to cover viewport */
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* fallback background color already defined on :root */
 }
 
 h1 {
