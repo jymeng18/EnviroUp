@@ -31,7 +31,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   /* full-viewport background image (served from public/) */
-  background-image: url('/background.jpeg');
+  background-image: url('/background.jpg');
   background-size: cover;           /* scale to cover viewport */
   background-position: center center;
   background-repeat: no-repeat;
