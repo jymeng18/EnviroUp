@@ -1,59 +1,107 @@
+# app/routes.py
 from flask import Blueprint, jsonify, request
+from app.ml_model import WildfirePredictor
 
 bp = Blueprint('routes', __name__)
 
-# Dummy wildfire data
+# Initialize and train model once when server starts
+print("Initializing wildfire prediction model...")
+predictor = WildfirePredictor(csv_path="./data/viirs-jpss1_2024_Canada.csv")
+predictor.train()
+
+# Dummy data for locations without ML predictions
 WILDFIRE_DATA = {
-    'bc': [
+    'british columbia': [
         {'latitude': 49.2827, 'longitude': -123.1207, 'name': 'Vancouver Fire', 'severity': 'moderate'},
         {'latitude': 50.6745, 'longitude': -120.3273, 'name': 'Kamloops Fire', 'severity': 'high'},
-        {'latitude': 53.9171, 'longitude': -122.7497, 'name': 'Prince George Fire', 'severity': 'low'},
-    ],
-    'california': [
-        {'latitude': 34.0522, 'longitude': -118.2437, 'name': 'Los Angeles Fire', 'severity': 'high'},
-        {'latitude': 37.7749, 'longitude': -122.4194, 'name': 'San Francisco Fire', 'severity': 'moderate'},
-    ],
-    'alberta': [
-        {'latitude': 51.0447, 'longitude': -114.0719, 'name': 'Calgary Fire', 'severity': 'moderate'},
-        {'latitude': 53.5461, 'longitude': -113.4938, 'name': 'Edmonton Fire', 'severity': 'high'},
     ]
+}
+
+# Location name to coordinates mapping
+LOCATION_COORDS = {
+    'bc': (54.0, -125.0),  # Center of BC
+    'vancouver': (49.2827, -123.1207),
+    'kamloops': (50.6745, -120.3273),
+    'prince george': (53.9171, -122.7497),
 }
 
 @bp.route('/api/search', methods=['POST'])
 def search_fires():
     """
-    Search for fires by location name
-    Frontend sends over user input: "British Columbia"
-    Backend must return: list of wildfire coordinates
+    Search for fires by location name using ML predictions
     """
     data = request.get_json()
-    
-    # Extract the query field from our frontend
     location = data.get('q', '').lower().strip()
     
     if not location:
         return jsonify({'error': 'Location query required'}), 400
     
-    # Search for matching fires
-    matching_fires = []
-    matched_region = None
-    
-    for region, fires in WILDFIRE_DATA.items():
-        if location in region or region in location:
-            matching_fires = fires
-            matched_region = region
+    # Try to get coordinates for the location
+    coords = None
+    for loc_name, loc_coords in LOCATION_COORDS.items():
+        if location in loc_name or loc_name in location:
+            coords = loc_coords
             break
     
-    if not matching_fires:
+    if not coords:
         return jsonify({
             'fires': [],
-            'count': 0,
-            'message': f'No wildfires found for "{location}"'
+            'message': f'Location "{location}" not recognized. Try: British Columbia, Vancouver, Kamloops'
         }), 404
     
-    return jsonify({
-        'fires': matching_fires,
-        'count': len(matching_fires),
-        'region': matched_region,
-        'searched_location': location
-    })
+    try:
+        # Get ML predictions
+        predicted_fires = predictor.predict(
+            center_lat=coords[0],
+            center_lon=coords[1],
+            search_radius_km=100,
+            top_n=10
+        )
+        
+        return jsonify({
+            'fires': predicted_fires,
+            'count': len(predicted_fires),
+            'location': location,
+            'center': {'lat': coords[0], 'lon': coords[1]},
+            'source': 'ML Prediction'
+        })
+        
+    except Exception as e:
+        print(f"ML prediction error: {e}")
+        # Fallback to dummy data
+        dummy_fires = WILDFIRE_DATA.get(location, [])
+        return jsonify({
+            'fires': dummy_fires,
+            'count': len(dummy_fires),
+            'location': location,
+            'source': 'Fallback Data'
+        })
+
+@bp.route('/api/predict-fires', methods=['POST'])
+def predict_fires_by_coords():
+    """
+    Predict fires by exact coordinates (lat/lon)
+    """
+    data = request.get_json()
+    lat = data.get('lat')
+    lon = data.get('lon')
+    radius = data.get('radius', 50)
+    
+    if lat is None or lon is None:
+        return jsonify({'error': 'lat and lon required'}), 400
+    
+    try:
+        predicted_fires = predictor.predict(
+            center_lat=float(lat),
+            center_lon=float(lon),
+            search_radius_km=radius,
+            top_n=10
+        )
+        
+        return jsonify({
+            'fires': predicted_fires,
+            'count': len(predicted_fires),
+            'center': {'lat': lat, 'lon': lon}
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
