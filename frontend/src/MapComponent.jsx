@@ -69,10 +69,6 @@ function LeafletMap({ fires, center }) {
                 <p><strong>Coordinates:</strong> {Number(fire.latitude).toFixed(4)}, {Number(fire.longitude).toFixed(4)}</p>
                 <p><strong>Severity:</strong> {fire.severity ?? 'unknown'}</p>
                 {fire.confidence !== undefined && <p><strong>Confidence:</strong> {Number(fire.confidence).toFixed(2)}</p>}
-                <details style={{marginTop: '8px'}}>
-                  <summary>Raw data</summary>
-                  <pre style={{whiteSpace: 'pre-wrap', maxHeight: '180px', overflow: 'auto'}}>{JSON.stringify(fire, null, 2)}</pre>
-                </details>
               </div>
             </Popup>
           </Marker>

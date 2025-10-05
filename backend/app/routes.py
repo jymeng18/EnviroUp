@@ -21,6 +21,7 @@ except Exception as e:
     chatbot = None
 
 # Dummy data for locations without ML predictions
+# Dummy data for locations without ML predictions or if predictions fail
 WILDFIRE_DATA = {
     'british columbia': [
         {'latitude': 49.2827, 'longitude': -123.1207, 'name': 'Vancouver Fire', 'severity': 'moderate'},
