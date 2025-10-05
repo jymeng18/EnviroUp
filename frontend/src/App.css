@@ -108,3 +108,66 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Enhanced styling for the main app */
+.app h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.app h2 {
+  color: #ff6b35;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.fire-item h3 {
+  color: #f7931e;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.fire-item p {
+  margin: 0.25rem 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Ensure the app doesn't interfere with chatbot positioning */
+.app {
+  position: relative;
+  z-index: 1;
+}
+
+/* Add some spacing for better layout */
+.fire-list {
+  margin-top: 2rem;
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  .app {
+    margin: 1rem;
+    padding: 1.5rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .app h1 {
+    font-size: 2rem;
+  }
+  
+  .search-section form {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .search-section input[type="search"],
+  .search-section input {
+    width: 100%;
+  }
+}

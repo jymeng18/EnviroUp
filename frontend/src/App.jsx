@@ -1,6 +1,7 @@
 // App.jsx
 import { useState } from 'react'
 import SearchBox from './searchBox'
+import FirePreventionChatbot from './FirePreventionChatbot'
 
 function App() {
   const [fires, setFires] = useState([])
@@ -28,6 +29,9 @@ function App() {
       ) : (
         <p>Search for a location to see wildfires</p>
       )}
+      
+      {/* Fire Prevention Chatbot */}
+      <FirePreventionChatbot />
     </div>
   )
 }
