@@ -1,6 +1,7 @@
 # app/routes.py
 from flask import Blueprint, jsonify, request
 from app.ml_model import WildfirePredictor
+from app.gemini_chatbot import FirePreventionChatbot
 
 bp = Blueprint('routes', __name__)
 
@@ -8,6 +9,16 @@ bp = Blueprint('routes', __name__)
 print("Initializing wildfire prediction model...")
 predictor = WildfirePredictor(csv_path="./data/viirs-jpss1_2024_Canada.csv")
 predictor.train()
+
+# Initialize Gemini chatbot
+print("Initializing Gemini fire prevention chatbot...")
+try:
+    chatbot = FirePreventionChatbot()
+    print("✅ Gemini chatbot initialized successfully!")
+except Exception as e:
+    print(f"⚠️  Warning: Gemini chatbot initialization failed: {e}")
+    print("   Make sure to set GOOGLE_API_KEY or GEMINI_API_KEY environment variable")
+    chatbot = None
 
 # Dummy data for locations without ML predictions
 WILDFIRE_DATA = {
@@ -105,3 +116,53 @@ def predict_fires_by_coords():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/chatbot/welcome', methods=['GET'])
+def chatbot_welcome():
+    """
+    Get welcome message from the fire prevention chatbot
+    """
+    if not chatbot:
+        return jsonify({
+            'success': False,
+            'error': 'Chatbot not available. Please set GOOGLE_API_KEY or GEMINI_API_KEY environment variable.'
+        }), 503
+    
+    try:
+        response = chatbot.get_welcome_message()
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get welcome message: {str(e)}'
+        }), 500
+
+@bp.route('/api/chatbot/chat', methods=['POST'])
+def chatbot_chat():
+    """
+    Send a message to the fire prevention chatbot
+    """
+    if not chatbot:
+        return jsonify({
+            'success': False,
+            'error': 'Chatbot not available. Please set GOOGLE_API_KEY or GEMINI_API_KEY environment variable.'
+        }), 503
+    
+    data = request.get_json()
+    message = data.get('message', '').strip()
+    conversation_history = data.get('conversation_history', [])
+    
+    if not message:
+        return jsonify({
+            'success': False,
+            'error': 'Message is required'
+        }), 400
+    
+    try:
+        response = chatbot.chat(message, conversation_history)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Chatbot error: {str(e)}'
+        }), 500

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import SearchBox from './searchBox'
 import MapComponent from './MapComponent'
+import FirePreventionChatbot from './FirePreventionChatbot'
 
 
 function App() {
@@ -64,6 +65,9 @@ function App() {
           </div>
         </div>
       ) : null}
+      
+      {/* Fire Prevention Chatbot */}
+      <FirePreventionChatbot />
     </div>
   )
 }
