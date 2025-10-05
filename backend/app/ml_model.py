@@ -148,7 +148,11 @@ class WildfirePredictor:
                 "latitude": float(row['lat']), 
                 "longitude": float(row['lon']),
                 "probability": float(row['prob']),
-                "name": f"Predicted Fire Zone {i+1}"
+                "name": f"Predicted Fire Zone {i+1}",
+                # Add severity + confidence so frontend can render these fields
+                # Map probability to simple severity buckets
+                "severity": ('high' if row['prob'] >= 0.75 else ('moderate' if row['prob'] >= 0.4 else ('low' if row['prob'] > 0 else 'unknown'))),
+                "confidence": float(row['prob'])
             } 
             for i, (_, row) in enumerate(top_preds.iterrows())
         ]

@@ -42,6 +42,10 @@ function MapUpdater({ fires, center }) {
 
 // Leaflet Map Component
 function LeafletMap({ fires, center }) {
+  useEffect(() => {
+    console.debug('LeafletMap received fires:', fires);
+  }, [fires]);
+
   return (
     <div style={{ height: '500px', width: '100%' }}>
       <MapContainer
@@ -62,9 +66,13 @@ function LeafletMap({ fires, center }) {
             <Popup>
               <div>
                 <h3>{fire.name}</h3>
-                <p><strong>Coordinates:</strong> {fire.latitude.toFixed(4)}, {fire.longitude.toFixed(4)}</p>
-                <p><strong>Severity:</strong> {fire.severity}</p>
-                {fire.confidence && <p><strong>Confidence:</strong> {fire.confidence.toFixed(2)}</p>}
+                <p><strong>Coordinates:</strong> {Number(fire.latitude).toFixed(4)}, {Number(fire.longitude).toFixed(4)}</p>
+                <p><strong>Severity:</strong> {fire.severity ?? 'unknown'}</p>
+                {fire.confidence !== undefined && <p><strong>Confidence:</strong> {Number(fire.confidence).toFixed(2)}</p>}
+                <details style={{marginTop: '8px'}}>
+                  <summary>Raw data</summary>
+                  <pre style={{whiteSpace: 'pre-wrap', maxHeight: '180px', overflow: 'auto'}}>{JSON.stringify(fire, null, 2)}</pre>
+                </details>
               </div>
             </Popup>
           </Marker>

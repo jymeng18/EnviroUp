@@ -455,6 +455,7 @@
 
 .demo-toggle{
   position: fixed;
+  bottom: 380px;
   right: 42%;
   color: white;
   padding: 20px 24px;

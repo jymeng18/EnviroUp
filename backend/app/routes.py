@@ -57,10 +57,31 @@ def search_fires():
             search_radius_km=100,
             top_n=10
         )
-        
+
+        # Ensure each predicted fire has 'severity' and 'confidence' fields
+        def ensure_fields(fire):
+            f = fire.copy()
+            prob = float(f.get('probability') or f.get('prob') or 0.0)
+            if 'severity' not in f or not f.get('severity'):
+                f['severity'] = 'high' if prob >= 0.75 else ('moderate' if prob >= 0.4 else ('low' if prob > 0 else 'unknown'))
+            if 'confidence' not in f:
+                f['confidence'] = prob
+            # Normalize key names: frontend expects 'latitude'/'longitude'
+            if 'lat' in f and 'latitude' not in f:
+                f['latitude'] = float(f['lat'])
+            if 'lon' in f and 'longitude' not in f:
+                f['longitude'] = float(f['lon'])
+            return f
+
+        augmented = [ensure_fields(f) for f in predicted_fires]
+
+        print(f"[DEBUG] Returning {len(augmented)} predicted fires for '{location}' (center={coords})")
+        if augmented:
+            print("[DEBUG] sample fire:", augmented[0])
+
         return jsonify({
-            'fires': predicted_fires,
-            'count': len(predicted_fires),
+            'fires': augmented,
+            'count': len(augmented),
             'location': location,
             'center': {'lat': coords[0], 'lon': coords[1]},
             'source': 'ML Prediction'
