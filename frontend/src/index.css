@@ -29,12 +29,14 @@ body {
   align-items: center;    /* vertical centering */
   justify-content: center;/* horizontal centering */
   min-width: 320px;
+  /* ensure background is clipped to the viewport height and avoid extra scroll */
   min-height: 100vh;
   /* full-viewport background image (served from public/) */
   background-image: url('/background.jpg');
   background-size: cover;           /* scale to cover viewport */
-  background-position: center center;
+  background-position: center top;  /* show top of image and chop bottom when needed */
   background-repeat: no-repeat;
+  background-attachment: fixed;     /* keep background fixed to viewport so it's clipped */
   /* fallback background color already defined on :root */
 }
 

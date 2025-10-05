@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Loader } from '@googlemaps/js-api-loader';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 
@@ -16,7 +15,8 @@ L.Icon.Default.mergeOptions({
 
 // Custom fire icon for Leaflet
 const fireIcon = new L.Icon({
-  iconUrl: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/color/512px/1f525.png',
+  // Use image from the public folder. Put `icon.png` in `frontend/public/` (served at /icon.png).
+  iconUrl: '/icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -42,6 +42,10 @@ function MapUpdater({ fires, center }) {
 
 // Leaflet Map Component
 function LeafletMap({ fires, center }) {
+  useEffect(() => {
+    console.debug('LeafletMap received fires:', fires);
+  }, [fires]);
+
   return (
     <div style={{ height: '500px', width: '100%' }}>
       <MapContainer
@@ -62,9 +66,13 @@ function LeafletMap({ fires, center }) {
             <Popup>
               <div>
                 <h3>{fire.name}</h3>
-                <p><strong>Coordinates:</strong> {fire.latitude.toFixed(4)}, {fire.longitude.toFixed(4)}</p>
-                <p><strong>Severity:</strong> {fire.severity}</p>
-                {fire.confidence && <p><strong>Confidence:</strong> {fire.confidence.toFixed(2)}</p>}
+                <p><strong>Coordinates:</strong> {Number(fire.latitude).toFixed(4)}, {Number(fire.longitude).toFixed(4)}</p>
+                <p><strong>Severity:</strong> {fire.severity ?? 'unknown'}</p>
+                {fire.confidence !== undefined && <p><strong>Confidence:</strong> {Number(fire.confidence).toFixed(2)}</p>}
+                <details style={{marginTop: '8px'}}>
+                  <summary>Raw data</summary>
+                  <pre style={{whiteSpace: 'pre-wrap', maxHeight: '180px', overflow: 'auto'}}>{JSON.stringify(fire, null, 2)}</pre>
+                </details>
               </div>
             </Popup>
           </Marker>
@@ -77,14 +85,14 @@ function LeafletMap({ fires, center }) {
 
 
 
-// Main Map Component with toggle
+// Main Map Component 
 export default function MapComponent({ fires = [], center = null }) {
   const [mapType, setMapType] = useState('leaflet'); // 'leaflet' or 'google'
 
   return (
     <div className="map-container">
       <div className="map-controls">
-        <h3>Wildfire Map</h3>
+        <h3>Showing you potential fire nearby</h3>
         <div className="map-toggle">
           <button
             className={mapType === 'leaflet' ? 'active' : ''}
@@ -92,31 +100,16 @@ export default function MapComponent({ fires = [], center = null }) {
           >
             Leaflet Map
           </button>
-          <button
-            className={mapType === 'google' ? 'active' : ''}
-            onClick={() => setMapType('google')}
-          >
-            Google Maps
-          </button>
         </div>
       </div>
       
       <div className="map-wrapper">
-        {mapType === 'leaflet' ? (
+        
           <LeafletMap fires={fires} center={center} />
-        ) : (
-          <GoogleMap fires={fires} center={center} />
-        )}
+      
       </div>
       
-      <div className="map-info">
-        <p>Showing {fires.length} wildfire{fires.length !== 1 ? 's' : ''}</p>
-        {mapType === 'google' && !process.env.REACT_APP_GOOGLE_MAPS_API_KEY && (
-          <p className="warning">
-            ⚠️ Google Maps requires an API key. Add REACT_APP_GOOGLE_MAPS_API_KEY to your environment variables.
-          </p>
-        )}
-      </div>
+      
     </div>
   );
 }

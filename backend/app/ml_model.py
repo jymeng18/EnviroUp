@@ -72,19 +72,19 @@ class WildfirePredictor:
     
     def train(self):
         """Train the model - call this once when server starts"""
-        print("🔥 Loading wildfire data...")
+        print(" Loading wildfire data...")
         self.df_fire = self.load_wildfire_data()
         
-        print("🔥 Preparing training data...")
+        print(" Preparing training data...")
         data, self.lat_bins, self.lon_bins, self.le_conf = self.prepare_training_data(self.df_fire)
         
-        print("🔥 Training model...")
+        print(" Training model...")
         X = data[['lat_bin', 'lon_bin', 'confidence_encoded', 'SIZE_HA']]
         y = data['target']
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.model.fit(X, y)
         
-        print("✅ Model trained successfully!")
+        print(" Model trained successfully!")
     
     def predict(self, center_lat, center_lon, search_radius_km=50, top_n=5):
         """Predict wildfire coordinates for a given location"""
@@ -148,7 +148,11 @@ class WildfirePredictor:
                 "latitude": float(row['lat']), 
                 "longitude": float(row['lon']),
                 "probability": float(row['prob']),
-                "name": f"Predicted Fire Zone {i+1}"
+                "name": f"Predicted Fire Zone {i+1}",
+                # Add severity + confidence so frontend can render these fields
+                # Map probability to simple severity buckets
+                "severity": ('high' if row['prob'] >= 0.75 else ('moderate' if row['prob'] >= 0.4 else ('low' if row['prob'] > 0 else 'unknown'))),
+                "confidence": float(row['prob'])
             } 
             for i, (_, row) in enumerate(top_preds.iterrows())
         ]
