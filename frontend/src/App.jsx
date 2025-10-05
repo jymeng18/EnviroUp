@@ -32,7 +32,7 @@ export default function App() {
     <>
       {!demoOpen && (
         <button className="demo-toggle" onClick={() => setDemoOpen(true)}>
-          Try it out, it is free!
+          Try us out, we are free!
         </button>
       )}
 

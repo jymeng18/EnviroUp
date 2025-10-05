@@ -452,3 +452,16 @@
     width: 100%;
   }
 }
+
+.demo-toggle{
+  position: fixed;
+  right: 42%;
+  color: white;
+  padding: 20px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
