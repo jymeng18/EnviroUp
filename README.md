@@ -51,7 +51,7 @@ This project directly supports:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/EnviroUp.git
+   git clone https://github.com/yourusername/Firewatch.git
    cd EnviroUp
    ```
 
