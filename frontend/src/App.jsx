@@ -36,7 +36,7 @@ function App() {
   return (
     <div className="app">
       <div className="app-header">
-        <h1>BC Wildfire Tracker</h1>
+        <h1>Hi we track fire near you</h1>
         <SearchBox onResults={handleSearchResults} onSearchStart={handleSearchStart} />
       </div>
       

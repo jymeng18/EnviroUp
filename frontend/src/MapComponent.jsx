@@ -16,7 +16,8 @@ L.Icon.Default.mergeOptions({
 
 // Custom fire icon for Leaflet
 const fireIcon = new L.Icon({
-  iconUrl: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/color/512px/1f525.png',
+  // Use image from the public folder. Put `icon.png` in `frontend/public/` (served at /icon.png).
+  iconUrl: '/icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -92,12 +93,6 @@ export default function MapComponent({ fires = [], center = null }) {
           >
             Leaflet Map
           </button>
-          <button
-            className={mapType === 'google' ? 'active' : ''}
-            onClick={() => setMapType('google')}
-          >
-            Google Maps
-          </button>
         </div>
       </div>
       
@@ -109,14 +104,7 @@ export default function MapComponent({ fires = [], center = null }) {
         )}
       </div>
       
-      <div className="map-info">
-        <p>Showing {fires.length} wildfire{fires.length !== 1 ? 's' : ''}</p>
-        {mapType === 'google' && !process.env.REACT_APP_GOOGLE_MAPS_API_KEY && (
-          <p className="warning">
-            ⚠️ Google Maps requires an API key. Add REACT_APP_GOOGLE_MAPS_API_KEY to your environment variables.
-          </p>
-        )}
-      </div>
+      
     </div>
   );
 }
