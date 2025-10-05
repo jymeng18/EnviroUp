@@ -16,7 +16,7 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return 2*R*np.arcsin(np.sqrt(a))
 
 # ------------------ Step 2: Load and preprocess wildfire data ------------------
-def load_wildfire_data(csv_path="/Users/nohimjayasinghe/Downloads/viirs-jpss1_2024_Canada.csv"):
+def load_wildfire_data(csv_path="./data/viirs-jpss1_2024_Canada.csv"):
     df = pd.read_csv(csv_path)
     # Filter for British Columbia (approximate bounds: lat 48-60, lon -139 to -114)
     df = df[(df['latitude'].between(48, 60)) & (df['longitude'].between(-139, -114))]
