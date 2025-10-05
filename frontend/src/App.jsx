@@ -38,7 +38,7 @@ export default function App() {
           </div>
 
           <div className="app-header">
-            <h1>We track fire near you</h1>
+            <h1>We predict fire near you</h1>
             <SearchBox onResults={handleSearchResults} onSearchStart={handleSearchStart} />
           </div>
 
