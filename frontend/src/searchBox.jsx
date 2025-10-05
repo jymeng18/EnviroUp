@@ -6,7 +6,7 @@ import { useState } from 'react'
  * - Sends the query to the backend via POST to /api/search (JSON: { q })
  * - Shows loading and error states and returns the response to the caller
  */
-export default function SearchBox({ onResults }) {
+export default function SearchBox({ onResults, onSearchStart }) {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -15,6 +15,9 @@ export default function SearchBox({ onResults }) {
     e.preventDefault()
     setError(null)
     setLoading(true)
+    
+    // Notify parent component that search started
+    if (onSearchStart) onSearchStart()
 
     try {
       const res = await fetch('http://localhost:5001/api/search', {
@@ -35,19 +38,37 @@ export default function SearchBox({ onResults }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <input
-        type="search"
-        placeholder="Search..."
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        style={{ padding: '8px 10px', flex: 1 }}
-        aria-label="Search"
-      />
-      <button type="submit" disabled={loading || !query.trim()} style={{ padding: '8px 12px' }}>
-        {loading ? 'Searching...' : 'Search'}
-      </button>
-      {error && <div role="alert" style={{ color: 'var(--danger, #c00)', marginLeft: 8 }}>{error}</div>}
-    </form>
+    <div className="search-container">
+      <form onSubmit={handleSubmit} className="search-form">
+        <input
+          type="search"
+          placeholder="Search for a location..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="search-input"
+          aria-label="Search"
+          disabled={loading}
+        />
+        <button 
+          type="submit" 
+          disabled={loading || !query.trim()} 
+          className={`search-button ${loading ? 'loading' : ''}`}
+        >
+          {loading ? (
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <span>Searching...</span>
+            </div>
+          ) : (
+            'Search'
+          )}
+        </button>
+      </form>
+      {error && (
+        <div className="error-message" role="alert">
+          {error}
+        </div>
+      )}
+    </div>
   )
 }
