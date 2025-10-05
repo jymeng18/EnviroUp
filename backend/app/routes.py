@@ -19,8 +19,7 @@ except Exception as e:
     print(f"⚠️  Warning: Gemini chatbot initialization failed: {e}")
     print("   Make sure to set GOOGLE_API_KEY or GEMINI_API_KEY environment variable")
     chatbot = None
-
-# Dummy data for locations without ML predictions
+    
 # Dummy data for locations without ML predictions or if predictions fail
 WILDFIRE_DATA = {
     'british columbia': [

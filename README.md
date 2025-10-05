@@ -19,9 +19,10 @@ This project directly supports:
 - **Interactive Maps** - Visualize predicted fire zones with Leaflet maps
 - **ML Predictions** - Machine learning model trained on real wildfire data
 - **Risk Assessment** - Severity and confidence scoring for each prediction
+- **AI Chatbot** - Gemini AI-powered chatbot for environmental education and wildfire information
 - **Beautiful UI** - Inspired by Firewatch's aesthetic
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -35,6 +36,9 @@ This project directly supports:
 ![Scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+
+### AI & Machine Learning
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)
 
 ## Quick Start
 
@@ -84,7 +88,17 @@ This project directly supports:
 2. **View predictions** - The map will display predicted fire zones with severity levels
 3. **Explore details** - Click on markers to see confidence scores and raw data
 4. **Learn about risks** - Each prediction includes severity assessment and confidence metrics
+5. **Chat with AI** - Use the Gemini AI chatbot to ask questions about wildfires, environmental safety, and climate action
 
+
+## AI Chatbot
+
+The platform features a **Gemini AI-powered chatbot** that provides:
+
+- **Environmental Education** - Learn about climate change, wildfires, and environmental safety
+- **Wildfire Information** - Get answers about fire prevention, safety tips, and emergency procedures
+- **Interactive Learning** - Ask questions about sustainable development goals and environmental awareness
+- **Real-time Assistance** - Get instant responses to your environmental and safety questions
 
 ## Machine Learning
 
