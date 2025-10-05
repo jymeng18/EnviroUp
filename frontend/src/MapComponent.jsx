@@ -92,7 +92,7 @@ export default function MapComponent({ fires = [], center = null }) {
   return (
     <div className="map-container">
       <div className="map-controls">
-        <h3>Wildfire Map</h3>
+        <h3>Showing you potential fire nearby</h3>
         <div className="map-toggle">
           <button
             className={mapType === 'leaflet' ? 'active' : ''}
