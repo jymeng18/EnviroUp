@@ -2,9 +2,11 @@
 import { useState, useEffect } from 'react'
 import SearchBox from './searchBox'
 import MapComponent from './MapComponent'
+import './App.css'
 
-
-function App() {
+export default function App() {
+  const [demoOpen, setDemoOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [fires, setFires] = useState([])
   const [center, setCenter] = useState(null)
   const [isSearching, setIsSearching] = useState(false)
@@ -14,11 +16,7 @@ function App() {
     setFires(data.fires || [])
     setCenter(data.center || null)
     setIsSearching(false)
-    
-    // Trigger animation for results
-    if (data.fires && data.fires.length > 0) {
-      setTimeout(() => setShowResults(true), 100)
-    }
+    if (data.fires && data.fires.length > 0) setTimeout(() => setShowResults(true), 100)
   }
 
   const handleSearchStart = () => {
@@ -26,46 +24,54 @@ function App() {
     setShowResults(false)
   }
 
-  // Reset search state when fires are cleared
   useEffect(() => {
-    if (fires.length === 0) {
-      setShowResults(false)
-    }
+    if (fires.length === 0) setShowResults(false)
   }, [fires.length])
 
   return (
-    <div className="app">
-      <div className="app-header">
-        <h1>Hi we track fire near you</h1>
-        <SearchBox onResults={handleSearchResults} onSearchStart={handleSearchStart} />
-      </div>
-      
-      {isSearching && (
-        <div className="search-loading">
-          <div className="loading-pulse">
-            <div className="pulse-dot"></div>
-            <div className="pulse-dot"></div>
-            <div className="pulse-dot"></div>
+    <>
+      {!demoOpen && (
+        <button className="demo-toggle" onClick={() => setDemoOpen(true)}>
+          Try it out, it is free!
+        </button>
+      )}
+
+      {demoOpen && (
+        <div className={`app ${hidden ? 'hidden' : ''}`}>
+          <div className="app-controls">
+            <button onClick={() => setHidden(h => !h)}>
+              {hidden ? 'Show app' : 'Hide app'}
+            </button>
           </div>
-          <p>Analyzing wildfire data...</p>
+
+          <div className="app-header">
+            <h1>We track fire near you</h1>
+            <SearchBox onResults={handleSearchResults} onSearchStart={handleSearchStart} />
+          </div>
+
+          {isSearching && (
+            <div className="search-loading">
+              <div className="loading-pulse">
+                <div className="pulse-dot"></div>
+                <div className="pulse-dot"></div>
+                <div className="pulse-dot"></div>
+              </div>
+              <p>Analyzing wildfire data...</p>
+            </div>
+          )}
+
+          {fires.length > 0 && showResults ? (
+            <MapComponent fires={fires} center={center} />
+          ) : !isSearching ? (
+            <div className="welcome-message">
+              <p>Search for a location to see wildfires</p>
+              <div className="search-hints">
+                <span>Try: Vancouver, British Columbia, or Kamloops</span>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
-      
-      {fires.length > 0 && showResults ? (
-       
-          
-          <MapComponent fires={fires} center={center} />
-       
-      ) : !isSearching ? (
-        <div className="welcome-message">
-          <p>Search for a location to see wildfires</p>
-          <div className="search-hints">
-            <span>Try: Vancouver, British Columbia, Kamloops</span>
-          </div>
-        </div>
-      ) : null}
-    </div>
+    </>
   )
 }
-
-export default App

@@ -399,6 +399,19 @@
 .fire-item:nth-child(4) { animation-delay: 0.4s; }
 .fire-item:nth-child(5) { animation-delay: 0.5s; }
 
+/* Hide the app when the hidden class is toggled */
+.app.hidden {
+  display: none !important;
+}
+
+/* App controls (hide/show button) */
+.app-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 999;
+}
+
 @keyframes slideInLeft {
   from {
     opacity: 0;

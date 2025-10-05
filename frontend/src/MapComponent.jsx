@@ -78,7 +78,7 @@ function LeafletMap({ fires, center }) {
 
 
 
-// Main Map Component with toggle
+// Main Map Component 
 export default function MapComponent({ fires = [], center = null }) {
   const [mapType, setMapType] = useState('leaflet'); // 'leaflet' or 'google'
 
