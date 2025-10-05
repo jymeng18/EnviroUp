@@ -78,16 +78,16 @@ Keep responses concise but informative, and always prioritize safety."""
     
     def get_welcome_message(self) -> dict:
         """Get a welcome message for new users"""
-        welcome_msg = """🔥 Welcome to the Fire Prevention Assistant! 🔥
+        welcome_msg = """🔥 Yo what's up, I am Henry, your 'fire' safety assistant! 
 
-I'm here to help you with wildfire safety and prevention. I can assist you with:
+I'm here to help you with wildfire safety and prevention. I can assist you with:\n
 
-• Creating defensible space around your home
-• Fire-resistant landscaping tips
-• Emergency evacuation planning
-• Understanding fire danger ratings
-• Home protection strategies
-• Community fire safety
+ Creating defensible space around your home,\n
+ Fire-resistant landscaping tips,\n
+ Emergency evacuation planning,\n
+ Understanding fire danger ratings,\n
+ Home protection strategies,\n
+ Community fire safety.
 
 What would you like to know about fire prevention?"""
         
