@@ -125,7 +125,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Campo Santo** for the beautiful Firewatch game that inspired this project
 - **NASA** for the VIIRS wildfire data
 - **UN Sustainable Development Goals** for the environmental mission
-- **OpenStreetMap** for map tiles
+- **Leaflet** for map tiles
 
 ---
 
