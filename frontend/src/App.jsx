@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import SearchBox from './searchBox'
 import MapComponent from './MapComponent'
+import {APIProvider} from 'vis.gl/react-google-maps'
 
 function App() {
   const [fires, setFires] = useState([])

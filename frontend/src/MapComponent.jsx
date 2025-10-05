@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Loader } from '@googlemaps/js-api-loader';
 import 'leaflet/dist/leaflet.css';
+import {APIProvider} from 'vis.gl/react-google-maps';
+import './App.css';
+
 
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -73,93 +76,7 @@ function LeafletMap({ fires, center }) {
   );
 }
 
-// Google Maps Component
-function GoogleMap({ fires, center }) {
-  const mapRef = useRef(null);
-  const [map, setMap] = useState(null);
-  const [markers, setMarkers] = useState([]);
 
-  useEffect(() => {
-    const initMap = async () => {
-      const loader = new Loader({
-        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
-        version: 'weekly',
-        libraries: ['places']
-      });
-
-      try {
-        const { Map } = await loader.importLibrary('maps');
-        
-        const mapInstance = new Map(mapRef.current, {
-          center: center ? { lat: center.lat, lng: center.lon } : { lat: 49.2827, lng: -123.1207 },
-          zoom: 8,
-          mapTypeId: 'terrain'
-        });
-        
-        setMap(mapInstance);
-      } catch (error) {
-        console.error('Error loading Google Maps:', error);
-      }
-    };
-
-    initMap();
-  }, [center]);
-
-  useEffect(() => {
-    if (!map) return;
-
-    // Clear existing markers
-    markers.forEach(marker => marker.setMap(null));
-    const newMarkers = [];
-
-    // Add new markers
-    fires.forEach((fire, index) => {
-      const marker = new window.google.maps.Marker({
-        position: { lat: fire.latitude, lng: fire.longitude },
-        map: map,
-        title: fire.name,
-        icon: {
-          url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-          scaledSize: new window.google.maps.Size(30, 30)
-        }
-      });
-
-      const infoWindow = new window.google.maps.InfoWindow({
-        content: `
-          <div>
-            <h3>${fire.name}</h3>
-            <p><strong>Coordinates:</strong> ${fire.latitude.toFixed(4)}, ${fire.longitude.toFixed(4)}</p>
-            <p><strong>Severity:</strong> ${fire.severity}</p>
-            ${fire.confidence ? `<p><strong>Confidence:</strong> ${fire.confidence.toFixed(2)}</p>` : ''}
-          </div>
-        `
-      });
-
-      marker.addListener('click', () => {
-        infoWindow.open(map, marker);
-      });
-
-      newMarkers.push(marker);
-    });
-
-    setMarkers(newMarkers);
-
-    // Fit bounds to show all markers
-    if (fires.length > 0) {
-      const bounds = new window.google.maps.LatLngBounds();
-      fires.forEach(fire => {
-        bounds.extend({ lat: fire.latitude, lng: fire.longitude });
-      });
-      map.fitBounds(bounds);
-    }
-  }, [map, fires]);
-
-  return (
-    <div style={{ height: '500px', width: '100%' }}>
-      <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
-    </div>
-  );
-}
 
 // Main Map Component with toggle
 export default function MapComponent({ fires = [], center = null }) {
