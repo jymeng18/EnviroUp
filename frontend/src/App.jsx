@@ -39,9 +39,6 @@ export default function App() {
       {demoOpen && (
         <div className={`app ${hidden ? 'hidden' : ''}`}>
           <div className="app-controls">
-            <button onClick={() => setHidden(h => !h)}>
-              {hidden ? 'Show app' : 'Hide app'}
-            </button>
           </div>
 
           <div className="app-header">

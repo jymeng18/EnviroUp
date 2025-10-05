@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Loader } from '@googlemaps/js-api-loader';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 
@@ -97,11 +96,9 @@ export default function MapComponent({ fires = [], center = null }) {
       </div>
       
       <div className="map-wrapper">
-        {mapType === 'leaflet' ? (
+        
           <LeafletMap fires={fires} center={center} />
-        ) : (
-          <GoogleMap fires={fires} center={center} />
-        )}
+      
       </div>
       
       

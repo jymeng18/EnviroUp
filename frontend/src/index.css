@@ -29,7 +29,7 @@ body {
   align-items: center;    /* vertical centering */
   justify-content: center;/* horizontal centering */
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 108dvh;
   /* full-viewport background image (served from public/) */
   background-image: url('/background.jpg');
   background-size: cover;           /* scale to cover viewport */
