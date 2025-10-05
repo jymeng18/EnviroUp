@@ -31,13 +31,8 @@ export default function App() {
 
   return (
     <>
+      {/* Main App Container */}
       {!demoOpen && (
-        <button className="demo-toggle" onClick={() => setDemoOpen(true)}>
-          Try us out, we are free!
-        </button>
-      )}
-
-      {demoOpen && (
         <div className={`app ${hidden ? 'hidden' : ''}`}>
           <div className="app-controls">
           </div>
