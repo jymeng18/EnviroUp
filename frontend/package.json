@@ -13,6 +13,7 @@
     "@googlemaps/js-api-loader": "^2.0.1",
     "leaflet": "^1.9.4",
     "react": "^19.1.1",
+    "react-scripts": "5.0.1",
     "react-dom": "^19.1.1",
     "react-leaflet": "^5.0.0"
   },
