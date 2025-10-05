@@ -142,14 +142,14 @@ const FirePreventionChatbot = () => {
         onClick={toggleChatbot}
         title="Fire Safety Assistant"
       >
-        🔥
+        <img src="../public/henry.jpeg" className="fire-assistant" alt="Henry" />
       </button>
 
       {/* Chatbot Window */}
       {isOpen && (
         <div className="chatbot-window">
           <div className="chatbot-header">
-            <h3>🔥 Fire Safety Assistant</h3>
+            <h3>Meet Henry</h3>
             <button className="chatbot-close" onClick={toggleChatbot}>
               ×
             </button>

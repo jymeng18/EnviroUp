@@ -5,8 +5,8 @@
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff6b6b, #ff5252);
   border: none;
@@ -312,4 +312,13 @@
   .chatbot-messages {
     padding: 0.75rem;
   }
+}
+
+.fire-assistant {
+  width: 56px;
+  height: 56px;
+  border-radius: 100%; /* circular avatar */
+  object-fit: cover;
+
+  display: block;
 }
