@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import SearchBox from './searchBox'
 import MapComponent from './MapComponent'
+import FirePreventionChatbot from './FirePreventionChatbot'
 import './App.css'
 
 export default function App() {
@@ -69,6 +70,8 @@ export default function App() {
           ) : null}
         </div>
       )}
+      {/* Fire Prevention Chatbot */}
+      <FirePreventionChatbot />
     </>
   )
 }
