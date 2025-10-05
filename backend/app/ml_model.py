@@ -72,19 +72,19 @@ class WildfirePredictor:
     
     def train(self):
         """Train the model - call this once when server starts"""
-        print("🔥 Loading wildfire data...")
+        print(" Loading wildfire data...")
         self.df_fire = self.load_wildfire_data()
         
-        print("🔥 Preparing training data...")
+        print(" Preparing training data...")
         data, self.lat_bins, self.lon_bins, self.le_conf = self.prepare_training_data(self.df_fire)
         
-        print("🔥 Training model...")
+        print(" Training model...")
         X = data[['lat_bin', 'lon_bin', 'confidence_encoded', 'SIZE_HA']]
         y = data['target']
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.model.fit(X, y)
         
-        print("✅ Model trained successfully!")
+        print(" Model trained successfully!")
     
     def predict(self, center_lat, center_lon, search_radius_km=50, top_n=5):
         """Predict wildfire coordinates for a given location"""
