@@ -20,8 +20,8 @@ function App() {
           {fires.map((fire, idx) => (
             <div key={idx} className="fire-item">
               <h3>{fire.name}</h3>
-              <p>📍 {fire.latitude}, {fire.longitude}</p>
-              <p>🔥 Severity: {fire.severity}</p>
+              <p> {fire.latitude}, {fire.longitude}</p>
+              <p> Severity: {fire.severity}</p>
             </div>
           ))}
         </div>
