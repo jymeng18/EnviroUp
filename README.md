@@ -4,6 +4,8 @@
 
 A wildfire prediction and awareness platform inspired by the beautiful game **Firewatch** by Campo Santo. This project combines machine learning with interactive mapping to help users understand and track potential wildfire risks in their areas.
 
+![App Intro](https://github.com/jymeng18/Firewatch/blob/main/frontend/public/intro.png?raw=true)
+
 ![Background Credit: Firewatch by Campo Santo](https://img.shields.io/badge/Background%20Image-Firewatch%20by%20Campo%20Santo-orange?style=for-the-badge)
 
 ## UN Sustainable Development Goals
