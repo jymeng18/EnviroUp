@@ -20,7 +20,8 @@ export default function SearchBox({ onResults, onSearchStart }) {
     if (onSearchStart) onSearchStart()
 
     try {
-      const res = await fetch('http://localhost:5001/api/search', {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+      const res = await fetch(`${apiBaseUrl}/api/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q: query }),

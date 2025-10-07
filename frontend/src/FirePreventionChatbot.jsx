@@ -26,7 +26,8 @@ const FirePreventionChatbot = () => {
 
   const fetchWelcomeMessage = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/chatbot/welcome');
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+      const response = await fetch(`${apiBaseUrl}/api/chatbot/welcome`);
       const data = await response.json();
       
       if (data.success) {
@@ -73,7 +74,8 @@ const FirePreventionChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/chatbot/chat', {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+      const response = await fetch(`${apiBaseUrl}/api/chatbot/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +144,7 @@ const FirePreventionChatbot = () => {
         onClick={toggleChatbot}
         title="Fire Safety Assistant"
       >
-        <img src="../public/henry.jpeg" className="fire-assistant" alt="Henry" />
+        <img src="/henry.jpeg" className="fire-assistant" alt="Henry" />
       </button>
 
       {/* Chatbot Window */}
